@@ -1,0 +1,24 @@
+{
+    "files.associations": {
+        "*.ino": "cpp",
+        "algorithm": "cpp",
+        "*.tcc": "cpp",
+        "unordered_map": "cpp",
+        "functional": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "cmath": "cpp",
+        "random": "cpp",
+        "fstream": "cpp",
+        "array": "cpp",
+        "utility": "cpp",
+        "sstream": "cpp",
+        "typeinfo": "cpp",
+        "exception": "cpp",
+        "iosfwd": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "streambuf": "cpp"
+    }
+}
