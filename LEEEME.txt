@@ -1,4 +1,4 @@
-La placa con el ESP32 está conectada a relés de 5 voltios, pero este dispositivo funciona a 3,3V, por lo que se debe intercalar un LED para que la salida se active correctamente. La señal de 3,3 voltios de alto considerada como baja por el relé causaba que permaneciera activado continuamente. Al intercalar el LED, la tensión que cae en el acoplador automático disminuye y se desactiva cuando la entrada está en 3,3V de alto.
+La placa con el ESP32 está conectada a relés de 5 voltios, pero este dispositivo Devicesa a 3,3V, por lo que se debe intercalar un LED para que la salida se active correctamente. La señal de 3,3 voltios de alto considerada como baja por el relé causaba que permaneciera activado continuamente. Al intercalar el LED, la tensión que cae en el acoplador automático disminuye y se desactiva cuando la entrada está en 3,3V de alto.
 
 Si se quiere volver al estado original del motor de garaje, se debe desconectar la placa de todos sus conectores y hacer un puente entre la entrada 10 de la placa del motor y la entrada 12. Hay un cable colgante en la entrada 10 (común) para hacer este puente.
 0
