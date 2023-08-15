@@ -12,8 +12,9 @@ WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
 #include <HardwareSerial.h>
-HardwareSerial ArduinoSerial(0);  // Crea una instancia de HardwareSerial asociada al puerto 0 pin: GPIO3  (RX1) y GPIO1  (TX1)
-HardwareSerial BTHC06(1);            // Crea una instancia de HardwareSerial asociada al puerto 1 pin: GPIO16 (RX2) y GPIO17 (TX2)
+HardwareSerial ArduinoSerial(0);  // Crea una instancia de HardwareSerial asociada al puerto 0 pin: GPIO3  (RX1) y GPIO1  (TX0)
+HardwareSerial BTHC06(1);         // Crea una instancia de HardwareSerial asociada al puerto 1 pin: GPIO16 (RX2) y GPIO17 (TX1)
+// HardwareSerial ArduinoSerial(2);  // Crea una instancia de HardwareSerial asociada al puerto 2 pin: GPIO18 (RX2) y GPIO19 (TX2)
 
 #include <ESP32Time.h>
 //#include <TelnetStream.h>       
@@ -48,9 +49,9 @@ void setup() {
     reconnect();
 
     // Serial.begin(9600);                           // Inicia el puerto serie USB
-    ArduinoSerial.begin(9600, SERIAL_8N1, 3, 1);  // Inicia el puerto serie 0 con los pines GPIO3  (RX1) y GPIO1  (TX1)
-    // ArduinoSerial.begin(9600, SERIAL_8N1, 18, 19);// Inicia el puerto serie 1 con los pines GPI18  (RX1) y GPI19  (TX1)
-    BTHC06.begin(9600, SERIAL_8N1, 16, 17);       // Inicia el puerto serie 2 con los pines GPIO16 (RX2) y GPIO17 (TX2)
+    ArduinoSerial.begin(9600, SERIAL_8N1, 3, 1);     // Inicia el puerto serie 0 con los pines GPIO3  (RX0) y GPIO1  (TX0)
+    BTHC06.begin(9600, SERIAL_8N1, 16, 17);          // Inicia el puerto serie 2 con los pines GPIO16 (RX1) y GPIO17 (TX1)
+    // ArduinoSerial.begin(9600, SERIAL_8N1, 18, 19);// Inicia el puerto serie 1 con los pines GPI18  (RX2) y GPI19  (TX2)
 
     // actualiza la hora de internet
     Actualiza_WebTime();
@@ -76,14 +77,14 @@ void loop() {
         // captura datos desde arduino pro-mini
         String data = ArduinoSerial.readString(); 
         // Bypass datos serie a BT HC06     
-        BTHC06.print(data);    
+        BTHC06.println(data);    
         // repite datos desde arduino>BT a Nodered
         for (int i = 0; i < sizeof(StatusON) / sizeof(StatusON[0]); i++) {
             if (data == StatusON[i]) {
-                Topic = TopicDevice+"/STATUS";
+                Topic = Devices[i]+"/status";
                 send_Nodered(Topic, "true");
             } else if (data == StatusOFF[i]) {
-                Topic = TopicDevice+"/STATUS";
+                Topic = Devices[i]+"/status";
                 send_Nodered(Topic, "false");    // deja pasar la cadena al puerto serie 1 al arduino pro mini
             }
         }

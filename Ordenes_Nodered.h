@@ -18,11 +18,11 @@ bool ordenes_Nodered() {
             if (receive_Topic==Devices[i]) {
                 if (receive_Payload=="true") {
                     ArduinoSerial.println(OrdenesON[i]);
-                    // Serial.print(OrdenesON[i]);
+                    // Serial.print("xxxx");
                 }
                 if (receive_Payload=="false") {
                     ArduinoSerial.println(OrdenesOFF[i]);
-                    // Serial.print(OrdenesOFF[i]);
+                    // Serial.print("xxxx");
                 }
             }   
         }
