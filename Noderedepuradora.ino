@@ -60,7 +60,7 @@ void setup() {
 
     // Comprueba la conexión Wifi.Y RECONECTA si se ha perdido.
     xTaskCreatePinnedToCore(keepWiFiAlive, "keepWiFiAlive", 1023, NULL, 2, NULL, 1);
-    xTaskCreatePinnedToCore(delayX, "delayX", 1000, NULL, 0, NULL, 0);
+    // xTaskCreatePinnedToCore(delayX, "delayX", 1000, NULL, 0, NULL, 0);
 
 }
 //·································································································································
@@ -133,22 +133,18 @@ void status_device() {
     //    Serial.println(rtc.getTime() );
 }
 
-
 // publica datos a nodered
 void send_Nodered(String topic, String value) {
     client.publish( (topic).c_str(), String ( value).c_str() );
 }
 
-
-// matiene conectado a la conexion WIFI y nodered
-void delayX(void * parameter){
-    for(;;){
-        vTaskDelay(3000 / portTICK_PERIOD_MS);
-        flag_delayX=true;
-    }
-}
-
-
+// // matiene conectado a la conexion WIFI y nodered
+// void delayX(void * parameter){
+//     for(;;){
+//         vTaskDelay(3000 / portTICK_PERIOD_MS);
+//         flag_delayX=true;
+//     }
+// }
 
 // actualiza tiempo desde internet
 void Actualiza_WebTime() {
