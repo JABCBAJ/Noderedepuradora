@@ -75,7 +75,8 @@ void loop() {
     
     if (ArduinoSerial.available()) {
         // captura datos desde arduino pro-mini
-        String data = ArduinoSerial.readString(); 
+        String data = ArduinoSerial.readStringUntil('\n'); ArduinoSerial.print(data);
+        Serial.flush();
         // Bypass datos serie a BT HC06     
         BTHC06.println(data);    
         // repite datos desde arduino>BT a Nodered
@@ -93,8 +94,9 @@ void loop() {
 
     // captura y reenvia datos desde BTHC06 al arduino
     if (BTHC06.available()) {
-        String data = BTHC06.readString();  // Lee un byte del puerto serie 2
+        String data = BTHC06.readStringUntil('\n');  // Lee un byte del puerto serie 2
         ArduinoSerial.print(data);          // Imprime el byte en el puerto serie 0
+        Serial.flush();
     }
 
     // envia estado del dispositivo a node red
