@@ -36,20 +36,18 @@ struct tm timeinfo;
 
 void setup() {
 
-    WiFi.disconnect(true);
-    delay(100);
+Serial.begin(115200); 
+    delay(1000);
     WiFi_conect();
     // OTA ESP32 
     setupOTA(Device, ssid, password); 
 
-    //comunicaciones();
-    
     client.setServer(mqttServer, mqttPort);
     client.setCallback(callback);
     reconnect();
 
     // Serial.begin(9600);                           // Inicia el puerto serie USB
-    ArduinoSerial.begin(9600, SERIAL_8N1, 3, 1);     // Inicia el puerto serie 0 con los pines GPIO3  (RX0) y GPIO1  (TX0)
+    ArduinoSerial.begin(9600, SERIAL_8N1, 3, 1);     //  3, 1 Inicia el puerto serie 0 con los pines GPIO3  (RX0) y GPIO1  (TX0)
     BTHC06.begin(9600, SERIAL_8N1, 16, 17);          // Inicia el puerto serie 2 con los pines GPIO16 (RX1) y GPIO17 (TX1)
     // ArduinoSerial.begin(9600, SERIAL_8N1, 18, 19);// Inicia el puerto serie 1 con los pines GPI18  (RX2) y GPI19  (TX2)
 
@@ -59,7 +57,7 @@ void setup() {
     now = time(NULL);
 
     // Comprueba la conexión Wifi.Y RECONECTA si se ha perdido.
-    xTaskCreatePinnedToCore(keepWiFiAlive, "keepWiFiAlive", 1023, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(keepWiFiAlive, "keepWiFiAlive", 1023, NULL, 2, NULL, 0);
     // xTaskCreatePinnedToCore(delayX, "delayX", 1000, NULL, 0, NULL, 0);
 
 }
@@ -126,6 +124,7 @@ void status_device() {
     client.publish( (TopicDevice+"/RSSI").c_str() , String ( WiFi.RSSI()).c_str() );
     client.publish( (TopicDevice+"/IP").c_str() , String ( WiFi.localIP().toString()).c_str() );
     client.publish( (TopicDevice+"/MAC").c_str() , String ( WiFi.macAddress()).c_str() );
+    client.publish( (TopicDevice+"/WIFI").c_str() , String ( WiFi.SSID()).c_str() );
     TelnetStream.print( WiFi.RSSI());
     TelnetStream.print( "-");
     TelnetStream.print( WiFi.localIP().toString());

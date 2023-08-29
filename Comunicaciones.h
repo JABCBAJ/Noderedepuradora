@@ -3,16 +3,30 @@
 /*...........................................................................
     inicia WiFi */
 void WiFi_conect() {
+    
+    // WiFi.mode(WIFI_STA);
+    ssid = ssidX[!ssid_list];
+
     int countdown;
-    Serial.print("\nconnecting to wifi...");
+    Serial.print("\nconnecting to wifi1...");
     countdown=millis();     // hay que utilizar milis, porque sin Wifi no Devicesa time(NULL).
+    WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED && (millis() - countdown) < 3000) {
-        WiFi.mode(WIFI_STA);
-        WiFi.begin(ssid, password);
         Serial.print(".");
-        delay(Wifi_Reconect);
-        WiFi.hostname(hostname);
+        delay(200);
+        if (WiFi.status() == WL_CONNECTED) {  WiFi.hostname(hostname);return; }
     }
+    ssid = ssidX[!ssid_list];
+
+    Serial.print("\nconnecting to wifi2...");
+    countdown=millis();     // hay que utilizar milis, porque sin Wifi no Devicesa time(NULL).
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED && (millis() - countdown) < 3000) {
+        Serial.print(".");
+        delay(200);
+        if (WiFi.status() == WL_CONNECTED) {  WiFi.hostname(hostname);return; }
+    }
+
 }
 //...........................................................................
 // Subscribe callback which is called when every packet has come

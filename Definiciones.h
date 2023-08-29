@@ -4,8 +4,10 @@
 String TopicDevice      = "prototype";  // porton prototype
 const char* Device      = "PROTOTIPO";  // PORTON PROTOTIPO
 
-const char* ssid        = "VIRUSLAN";
-const char* password    = "1Q2W3E4R5T6Y7U8I9O0P$";
+boolean ssid_list        = 1;
+const char* ssid         = "";
+const char* ssidX[]       = {"VIRUSLAN32", "VIRUSLAN"};
+const char* password     = "1Q2W3E4R5T6Y7U8I9O0P$";
 const char* hostname     = "AstralClient";
 
 #define Wifi_Reconect 100
