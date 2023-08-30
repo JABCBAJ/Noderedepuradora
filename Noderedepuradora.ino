@@ -36,23 +36,21 @@ struct tm timeinfo;
 
 void setup() {
 
-    
-    Serial.begin(115200);    
-
-    while (WiFi.status()!=WL_CONNECTED) {WiFi_conect();}
-     for (size_t i = 0; i < 200; i++) {delayMicroseconds(10000);}
-    
-    setupOTA(Device, ssid, password); 
-
-    mqttclient.setServer(mqttServer, mqttPort);
-    mqttclient.setCallback(callback);
-    
-    reconnect();
-
-    // Serial.begin(9600);                           // Inicia el puerto serie USB
+    Serial.begin(9600);                           // Inicia el puerto serie USB
     ArduinoSerial.begin(9600, SERIAL_8N1, 3, 1);     //  3, 1 Inicia el puerto serie 0 con los pines GPIO3  (RX0) y GPIO1  (TX0)
     BTHC06.begin(9600, SERIAL_8N1, 16, 17);          // Inicia el puerto serie 2 con los pines GPIO16 (RX1) y GPIO17 (TX1)
     // ArduinoSerial.begin(9600, SERIAL_8N1, 18, 19);// Inicia el puerto serie 1 con los pines GPI18  (RX2) y GPI19  (TX2)
+    
+
+    WiFi_conect();
+
+    setupOTA(Device, ssid, password);
+    for (size_t i = 0; i < 200; i++) {delayMicroseconds(10000);}
+    
+    mqttclient.setServer(mqttServer, mqttPort);
+    mqttclient.setCallback(callback);
+    
+    // reconnect();
 
     // actualiza la hora de internet
     Actualiza_WebTime();
@@ -60,20 +58,22 @@ void setup() {
     now = time(NULL);
 
     // Comprueba la conexión Wifi.Y RECONECTA si se ha perdido.
-    // xTaskCreatePinnedToCore(keepWiFiAlive, "keepWiFiAlive", 1023, NULL, 2, NULL, 0);
+    // xTaskCreatePinnedToCore(keepWiFiAlive, "keepWiFiAlive", 1023, NULL, 1, NULL, 1);
     // xTaskCreatePinnedToCore(delayX, "delayX", 1000, NULL, 0, NULL, 0);
 
+    Serial.println("#### run ####");
+    // Serial.println("OTA run OTA");
 }
 //·································································································································
 //·································································································································
 
 void loop() {
 
-    if (WiFi.status()!=WL_CONNECTED) {WiFi_conect();}
-
     ArduinoOTA.handle();
 
-    if (!mqttclient.connected()) {reconnect();}
+    if (WiFi.status()!=WL_CONNECTED) {WiFi_conect();}
+
+    if (WiFi.status()==WL_CONNECTED && !mqttclient.connected()) {reconnect();}
     
     ordenes_Nodered();
     now = time(NULL);
@@ -120,6 +120,7 @@ void loop() {
         Actualiza_WebTime();  // UNA VEZ AL DIA
     }
 
+    
     delay(100);
     mqttclient.loop();
 }
