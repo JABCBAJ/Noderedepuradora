@@ -5,28 +5,18 @@
 void WiFi_conect() {
     
     // WiFi.mode(WIFI_STA);
-    ssid = ssidX[!ssid_list];
+    ssid_list=!ssid_list;
+    ssid = ssidX[ssid_list];
 
     int countdown;
-    Serial.print("\nconnecting to wifi1...");
+    Serial.print("\nconnecting to wifi-" + (String) ssid_list);
     countdown=millis();     // hay que utilizar milis, porque sin Wifi no Devicesa time(NULL).
     WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED && (millis() - countdown) < 3000) {
+    while (WiFi.status() != WL_CONNECTED && (millis() - countdown) < 20000) {
         Serial.print(".");
-        delay(200);
-        if (WiFi.status() == WL_CONNECTED) {  WiFi.hostname(hostname);return; }
+        for (size_t i = 0; i < 20; i++) {delayMicroseconds(10000);}
+        if (WiFi.status() == WL_CONNECTED) {  WiFi.hostname(hostname); Serial.println(WiFi.SSID());}
     }
-    ssid = ssidX[!ssid_list];
-
-    Serial.print("\nconnecting to wifi2...");
-    countdown=millis();     // hay que utilizar milis, porque sin Wifi no Devicesa time(NULL).
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED && (millis() - countdown) < 3000) {
-        Serial.print(".");
-        delay(200);
-        if (WiFi.status() == WL_CONNECTED) {  WiFi.hostname(hostname);return; }
-    }
-
 }
 //...........................................................................
 // Subscribe callback which is called when every packet has come
@@ -38,31 +28,38 @@ void callback(char* topic, byte* payload, unsigned int length) {
 //...........................................................................
 // reconecta con MQTT
 void reconnect() {
-    while (!client.connected()) {
-        Serial.println("Intentando conexión MQTT...");
+   
+    Serial.println("Intentando conexión MQTT...");
+    mqttclient.connect(hostname);
 
-        if (client.connect(hostname)) {
-            
-            Serial.println("Conectado al servidor MQTT");
-            // ***************************************************
-            // subscribe topics
-            client.subscribe((TopicDevice+"/Mqtt_Live").c_str() );
-            client.subscribe((TopicDevice+"/MOTOR").c_str() );
-            client.subscribe((TopicDevice+"/CLORO").c_str() );
-            client.subscribe((TopicDevice+"/FOCO").c_str() );
-            client.subscribe((TopicDevice+"/TIMER").c_str() );
-            // subscribe topics
-            // ***************************************************
-            flag_mqtt_ok=true;
-        }
-        else {
-            // TelnetStream.print("Error de conexión MQTT, rc=");
-            Serial.print("Error de conexión MQTT, rc=");
-            // TelnetStream.print(client.state());
-            Serial.print(client.state());
-            // TelnetStream.println(" Reintentando en 5 segundos...");
-            Serial.println(" Reintentando en 5 segundos...");
-            delay(5000);
-        }
+    if (mqttclient.connected()) {
+        Serial.println("Conectado al servidor MQTT");
+        // ***************************************************
+        // subscribe topics
+        mqttclient.subscribe((TopicDevice+"/Mqtt_Live").c_str() );
+        mqttclient.subscribe((TopicDevice+"/MOTOR").c_str() );
+        mqttclient.subscribe((TopicDevice+"/CLORO").c_str() );
+        mqttclient.subscribe((TopicDevice+"/FOCO").c_str() );
+        mqttclient.subscribe((TopicDevice+"/TIMER").c_str() );
+        // subscribe topics
+        // ***************************************************
+        flag_mqtt_ok=true;
+    // }
+    // else {
+    //     // TelnetStream.print("Error de conexión MQTT, rc=");
+    //     Serial.print("Error de conexión MQTT, rc=");
+    //     // TelnetStream.print(mqttclient.state());
+    //     Serial.print(mqttclient.state());
+    //     // TelnetStream.println(" Reintentando en 5 segundos...");
+    //     Serial.println(" Reintentando en 5 segundos...");
+    //     delay(1000);
+        
+    //     WiFiClient mqttclient;
+    //     if (mqttclient.connect("192.168.1.59", 1883)) {
+    //     Serial.println("-- Conectado a DOMOTICA --");
+    //     //mqttclient.stop();
+    //     } else {Serial.println(" -- No se pudo conectar a Internet -- ");}
+
+    //     if(WiFi.status()!=WL_CONNECTED) { WiFi_conect();}
     }
 }

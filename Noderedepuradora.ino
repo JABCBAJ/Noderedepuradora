@@ -9,7 +9,7 @@
 #include <PubSubClient.h>
 
 WiFiClient wifiClient;
-PubSubClient client(wifiClient);
+PubSubClient mqttclient(wifiClient);
 
 #include <HardwareSerial.h>
 HardwareSerial ArduinoSerial(0);  // Crea una instancia de HardwareSerial asociada al puerto 0 pin: GPIO3  (RX1) y GPIO1  (TX0)
@@ -36,14 +36,17 @@ struct tm timeinfo;
 
 void setup() {
 
-Serial.begin(115200); 
-    delay(1000);
-    WiFi_conect();
-    // OTA ESP32 
+    
+    Serial.begin(115200);    
+
+    while (WiFi.status()!=WL_CONNECTED) {WiFi_conect();}
+     for (size_t i = 0; i < 200; i++) {delayMicroseconds(10000);}
+    
     setupOTA(Device, ssid, password); 
 
-    client.setServer(mqttServer, mqttPort);
-    client.setCallback(callback);
+    mqttclient.setServer(mqttServer, mqttPort);
+    mqttclient.setCallback(callback);
+    
     reconnect();
 
     // Serial.begin(9600);                           // Inicia el puerto serie USB
@@ -57,7 +60,7 @@ Serial.begin(115200);
     now = time(NULL);
 
     // Comprueba la conexión Wifi.Y RECONECTA si se ha perdido.
-    xTaskCreatePinnedToCore(keepWiFiAlive, "keepWiFiAlive", 1023, NULL, 2, NULL, 0);
+    // xTaskCreatePinnedToCore(keepWiFiAlive, "keepWiFiAlive", 1023, NULL, 2, NULL, 0);
     // xTaskCreatePinnedToCore(delayX, "delayX", 1000, NULL, 0, NULL, 0);
 
 }
@@ -66,8 +69,12 @@ Serial.begin(115200);
 
 void loop() {
 
+    if (WiFi.status()!=WL_CONNECTED) {WiFi_conect();}
+
     ArduinoOTA.handle();
-    if (!client.connected()) {reconnect();}
+
+    if (!mqttclient.connected()) {reconnect();}
+    
     ordenes_Nodered();
     now = time(NULL);
     
@@ -114,17 +121,17 @@ void loop() {
     }
 
     delay(100);
-    client.loop();
+    mqttclient.loop();
 }
 //###########################################################################################
 
 // manda a node-red el estado del sistema
 void status_device() {
 
-    client.publish( (TopicDevice+"/RSSI").c_str() , String ( WiFi.RSSI()).c_str() );
-    client.publish( (TopicDevice+"/IP").c_str() , String ( WiFi.localIP().toString()).c_str() );
-    client.publish( (TopicDevice+"/MAC").c_str() , String ( WiFi.macAddress()).c_str() );
-    client.publish( (TopicDevice+"/WIFI").c_str() , String ( WiFi.SSID()).c_str() );
+    mqttclient.publish( (TopicDevice+"/RSSI").c_str() , String ( WiFi.RSSI()).c_str() );
+    mqttclient.publish( (TopicDevice+"/IP").c_str() , String ( WiFi.localIP().toString()).c_str() );
+    mqttclient.publish( (TopicDevice+"/MAC").c_str() , String ( WiFi.macAddress()).c_str() );
+    mqttclient.publish( (TopicDevice+"/WIFI").c_str() , String ( WiFi.SSID()).c_str() );
     TelnetStream.print( WiFi.RSSI());
     TelnetStream.print( "-");
     TelnetStream.print( WiFi.localIP().toString());
@@ -136,7 +143,7 @@ void status_device() {
 
 // publica datos a nodered
 void send_Nodered(String topic, String value) {
-    client.publish( (topic).c_str(), String ( value).c_str() );
+    mqttclient.publish( (topic).c_str(), String ( value).c_str() );
 }
 
 // // matiene conectado a la conexion WIFI y nodered

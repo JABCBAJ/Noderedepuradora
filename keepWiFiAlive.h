@@ -4,14 +4,14 @@ void keepWiFiAlive(void * parameter){
     
     for(;;){
 
-        vTaskDelay(20000 / portTICK_PERIOD_MS);
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
 
         if(WiFi.status()!=WL_CONNECTED) { 
             //WiFi.disconnect(true); 
             //for (size_t i = 0; i < 100; i++) {delayMicroseconds(10000);}
-            ssid_list = !ssid_list;
+            // WiFi.disconnect(true);
             WiFi_conect();
-            Serial.print("wifi ssid");
+            // Serial.print("wifi ssid");
 
         }
 
@@ -21,6 +21,7 @@ void keepWiFiAlive(void * parameter){
             ESP.restart();
         }
 
+        
     }
 }
 
