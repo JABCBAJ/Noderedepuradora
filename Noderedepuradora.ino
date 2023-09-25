@@ -16,7 +16,7 @@ PubSubClient mqttclient(wifiClient);
 #include <HardwareSerial.h>
 //HardwareSerial Serial(0);  // Crea una instancia de HardwareSerial asociada al puerto 0 pin: GPIO3  (RX1) y GPIO1  (TX0)
 HardwareSerial BTHC06(1);         // Crea una instancia de HardwareSerial asociada al puerto 1 pin: GPIO16 (RX2) y GPIO17 (TX1)
-// HardwareSerial ArduinoSerial(2);  // Crea una instancia de HardwareSerial asociada al puerto 2 pin: GPIO18 (RX2) y GPIO19 (TX2)
+HardwareSerial ArduinoSerial(2);  // Crea una instancia de HardwareSerial asociada al puerto 2 pin: GPIO18 (RX2) y GPIO19 (TX2)
 
 #include <ESP32Time.h> 
 
@@ -37,15 +37,13 @@ struct tm timeinfo;
 
 void setup() {
 
-    Serial.begin(9600);                                 // Inicia el puerto serie USB
-    Serial.setTimeout(100);
-    // ArduinoSerial.begin(9600, SERIAL_8N1, 15, 2);       //  3, 1 (15,2)Inicia el puerto serie 0 con los pines GPIO3  (RX0) y GPIO1  (TX0)
-    // ArduinoSerial.setTimeout(100);
+    // Serial.begin(9600, SERIAL_8N1, 3, 1);                                 // Inicia el puerto serie USB
+    // Serial.setTimeout(100);
+    ArduinoSerial.begin(9600, SERIAL_8N1, 15, 2);       //  3, 1 (15,2)Inicia el puerto serie 0 con los pines GPIO3  (RX0) y GPIO1  (TX0)
+    ArduinoSerial.setTimeout(100);
     BTHC06.begin(9600, SERIAL_8N1, 16, 17);             // Inicia el puerto serie 2 con los pines GPIO16 (RX1) y GPIO17 (TX1)
     BTHC06.setTimeout(100);
-    // Serial.begin(9600, SERIAL_8N1, 18, 19);   // Inicia el puerto serie 1 con los pines GPI18  (RX2) y GPI19  (TX2)
     
-
     WiFi_conect();
 
     setupOTA(Device, ssid, password);
@@ -65,8 +63,8 @@ void setup() {
     // xTaskCreatePinnedToCore(keepWiFiAlive, "keepWiFiAlive", 1023, NULL, 1, NULL, 1);
     // xTaskCreatePinnedToCore(delayX, "delayX", 1000, NULL, 0, NULL, 0);
 
-    //Serial.println("#### run ####");
-    // Serial.println("OTA run OTA");
+    Serial.println("#### run ####");
+    Serial.println("OTA run OTA");
 }
 //·································································································································
 //·································································································································
@@ -84,12 +82,12 @@ void loop() {
     
     String data;
 
-    if (Serial.available()) {
+    if (ArduinoSerial.available()) {
         // Captura datos desde Arduino Pro Mini
         data = Serial.readString(); 
         // Bypass datos serie a BT HC06
-        BTHC06.write(data.c_str(), data.length());
-        Serial.write(data.c_str(), data.length());
+        BTHC06.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
+        ArduinoSerial.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
 
         // estados desde Arduino a Node-RED
         for (int i = 0; i < sizeof(StatusON) / sizeof(StatusON[0]); i++) {
@@ -107,8 +105,8 @@ void loop() {
 
     // captura y reenvia datos desde BTHC06 al arduino
     if (BTHC06.available()) {
-        String data = BTHC06.readString(); // Lee un byte del puerto serie 2
-        Serial.write(data.c_str(), data.length()); // Envía el byte al puerto serie 0
+        String data = BTHC06.readString();          // Lee un byte del puerto serie GPIO15
+        ArduinoSerial.write(data.c_str(), data.length());  // Envía el byte al puerto serie GPIO2
     }
 
 
@@ -150,7 +148,7 @@ void status_device() {
     TelnetStream.print( "Bateria: ");
     TelnetStream.print(batteryVoltage);
     TelnetStream.println( "V");
-    //    Serial.println(rtc.getTime() );
+    //    ArduinoSerial.println(rtc.getTime() );
 }
 
 // publica datos a nodered
