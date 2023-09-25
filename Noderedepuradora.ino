@@ -14,9 +14,9 @@ WiFiClient wifiClient;
 PubSubClient mqttclient(wifiClient);
 
 #include <HardwareSerial.h>
-HardwareSerial erial(0);  // Crea una instancia de HardwareSerial asociada al puerto 0 pin: GPIO3  (RX1) y GPIO1  (TX0)
+//HardwareSerial Serial(0);  // Crea una instancia de HardwareSerial asociada al puerto 0 pin: GPIO3  (RX1) y GPIO1  (TX0)
 HardwareSerial BTHC06(1);         // Crea una instancia de HardwareSerial asociada al puerto 1 pin: GPIO16 (RX2) y GPIO17 (TX1)
-// HardwareSerial erial(2);  // Crea una instancia de HardwareSerial asociada al puerto 2 pin: GPIO18 (RX2) y GPIO19 (TX2)
+// HardwareSerial ArduinoSerial(2);  // Crea una instancia de HardwareSerial asociada al puerto 2 pin: GPIO18 (RX2) y GPIO19 (TX2)
 
 #include <ESP32Time.h> 
 
@@ -65,7 +65,7 @@ void setup() {
     // xTaskCreatePinnedToCore(keepWiFiAlive, "keepWiFiAlive", 1023, NULL, 1, NULL, 1);
     // xTaskCreatePinnedToCore(delayX, "delayX", 1000, NULL, 0, NULL, 0);
 
-    Serial.println("#### run ####");
+    //Serial.println("#### run ####");
     // Serial.println("OTA run OTA");
 }
 //·································································································································
@@ -89,7 +89,6 @@ void loop() {
         data = Serial.readString(); 
         // Bypass datos serie a BT HC06
         BTHC06.write(data.c_str(), data.length());
-        Serial.write(data.c_str(), data.length());
         Serial.write(data.c_str(), data.length());
 
         // estados desde Arduino a Node-RED
