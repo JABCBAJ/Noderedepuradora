@@ -38,3 +38,5 @@ String  StatusON[]     = {"<Imgs00:1", "<Imgs01:1", "<Imgs02:1", "<Imgs16:1"};  
 String Comand_Timer = {"L373528"};              // Comand Encript for timer mode temporizador 15 minutos
 String Comand_Prog  = {"@373528"};              // Comand Encript for program alarms mode
 String Comand_Reloj = {"T373528"};              // Comand Encript for time display mode
+
+float batteryVoltage = 0;

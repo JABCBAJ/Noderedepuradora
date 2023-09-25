@@ -17,11 +17,11 @@ bool ordenes_Nodered() {
         for (int i = 0; i < sizeof(Devices) / sizeof(Devices[0]); i++) {
             if (receive_Topic==Devices[i]) {
                 if (receive_Payload=="true") {
-                    ArduinoSerial.print(OrdenesON[i]);
+                    Serial.print(OrdenesON[i]);
                     // Serial.print("xxxx");
                 }
                 if (receive_Payload=="false") {
-                    ArduinoSerial.print(OrdenesOFF[i]);
+                    Serial.print(OrdenesOFF[i]);
                     // Serial.print("xxxx");
                 }
             }   

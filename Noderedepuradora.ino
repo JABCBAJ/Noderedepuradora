@@ -8,16 +8,17 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
+#include "VccRead.h"
+
 WiFiClient wifiClient;
 PubSubClient mqttclient(wifiClient);
 
 #include <HardwareSerial.h>
-HardwareSerial ArduinoSerial(0);  // Crea una instancia de HardwareSerial asociada al puerto 0 pin: GPIO3  (RX1) y GPIO1  (TX0)
+HardwareSerial erial(0);  // Crea una instancia de HardwareSerial asociada al puerto 0 pin: GPIO3  (RX1) y GPIO1  (TX0)
 HardwareSerial BTHC06(1);         // Crea una instancia de HardwareSerial asociada al puerto 1 pin: GPIO16 (RX2) y GPIO17 (TX1)
-// HardwareSerial ArduinoSerial(2);  // Crea una instancia de HardwareSerial asociada al puerto 2 pin: GPIO18 (RX2) y GPIO19 (TX2)
+// HardwareSerial erial(2);  // Crea una instancia de HardwareSerial asociada al puerto 2 pin: GPIO18 (RX2) y GPIO19 (TX2)
 
-#include <ESP32Time.h>
-//#include <TelnetStream.h>       
+#include <ESP32Time.h> 
 
 #include "Comunicaciones.h"
 #include "keepWiFiAlive.h"
@@ -36,10 +37,13 @@ struct tm timeinfo;
 
 void setup() {
 
-    Serial.begin(9600);                           // Inicia el puerto serie USB
-    ArduinoSerial.begin(9600, SERIAL_8N1, 3, 1);     //  3, 1 Inicia el puerto serie 0 con los pines GPIO3  (RX0) y GPIO1  (TX0)
-    BTHC06.begin(9600, SERIAL_8N1, 16, 17);          // Inicia el puerto serie 2 con los pines GPIO16 (RX1) y GPIO17 (TX1)
-    // ArduinoSerial.begin(9600, SERIAL_8N1, 18, 19);// Inicia el puerto serie 1 con los pines GPI18  (RX2) y GPI19  (TX2)
+    Serial.begin(9600);                                 // Inicia el puerto serie USB
+    Serial.setTimeout(100);
+    // ArduinoSerial.begin(9600, SERIAL_8N1, 15, 2);       //  3, 1 (15,2)Inicia el puerto serie 0 con los pines GPIO3  (RX0) y GPIO1  (TX0)
+    // ArduinoSerial.setTimeout(100);
+    BTHC06.begin(9600, SERIAL_8N1, 16, 17);             // Inicia el puerto serie 2 con los pines GPIO16 (RX1) y GPIO17 (TX1)
+    BTHC06.setTimeout(100);
+    // Serial.begin(9600, SERIAL_8N1, 18, 19);   // Inicia el puerto serie 1 con los pines GPI18  (RX2) y GPI19  (TX2)
     
 
     WiFi_conect();
@@ -78,35 +82,39 @@ void loop() {
     ordenes_Nodered();
     now = time(NULL);
     
-    if (ArduinoSerial.available()) {
-        // captura datos desde arduino pro-mini
-        String data = ArduinoSerial.readStringUntil('\n'); ArduinoSerial.print(data);
-        Serial.flush();
-        // Bypass datos serie a BT HC06     
-        BTHC06.println(data);    
-        // repite datos desde arduino>BT a Nodered
+    String data;
+
+    if (Serial.available()) {
+        // Captura datos desde Arduino Pro Mini
+        data = Serial.readString(); 
+        // Bypass datos serie a BT HC06
+        BTHC06.write(data.c_str(), data.length());
+        Serial.write(data.c_str(), data.length());
+        Serial.write(data.c_str(), data.length());
+
+        // estados desde Arduino a Node-RED
         for (int i = 0; i < sizeof(StatusON) / sizeof(StatusON[0]); i++) {
             if (data == StatusON[i]) {
-                Topic = Devices[i]+"/status";
+                Topic = Devices[i] + "/status";
                 send_Nodered(Topic, "true");
             } else if (data == StatusOFF[i]) {
-                Topic = Devices[i]+"/status";
-                send_Nodered(Topic, "false");    // deja pasar la cadena al puerto serie 1 al arduino pro mini
+                Topic = Devices[i] + "/status";
+                send_Nodered(Topic, "false");
             }
         }
-        data="";
+        data = "";
     }
+
 
     // captura y reenvia datos desde BTHC06 al arduino
     if (BTHC06.available()) {
-        String data = BTHC06.readStringUntil('\n');  // Lee un byte del puerto serie 2
-        ArduinoSerial.print(data);          // Imprime el byte en el puerto serie 0
-        Serial.flush();
+        String data = BTHC06.readString(); // Lee un byte del puerto serie 2
+        Serial.write(data.c_str(), data.length()); // Envía el byte al puerto serie 0
     }
+
 
     // envia estado del dispositivo a node red
     static int statustime=time(NULL);
-    //Serial.println(statustime);
     if (now-statustime > nodered_ciclo  || Update_Node_Red) {
         Update_Node_Red=false;
         statustime=time(NULL);
@@ -133,12 +141,16 @@ void status_device() {
     mqttclient.publish( (TopicDevice+"/IP").c_str() , String ( WiFi.localIP().toString()).c_str() );
     mqttclient.publish( (TopicDevice+"/MAC").c_str() , String ( WiFi.macAddress()).c_str() );
     mqttclient.publish( (TopicDevice+"/WIFI").c_str() , String ( WiFi.SSID()).c_str() );
+    mqttclient.publish( (TopicDevice+"/BAT").c_str() , String ( batteryVoltage).c_str() );
     TelnetStream.print( WiFi.RSSI());
     TelnetStream.print( "-");
     TelnetStream.print( WiFi.localIP().toString());
     TelnetStream.print( "-");
     TelnetStream.println(WiFi.macAddress());
     TelnetStream.println(rtc.getTime()    );
+    TelnetStream.print( "Bateria: ");
+    TelnetStream.print(batteryVoltage);
+    TelnetStream.println( "V");
     //    Serial.println(rtc.getTime() );
 }
 
@@ -146,14 +158,6 @@ void status_device() {
 void send_Nodered(String topic, String value) {
     mqttclient.publish( (topic).c_str(), String ( value).c_str() );
 }
-
-// // matiene conectado a la conexion WIFI y nodered
-// void delayX(void * parameter){
-//     for(;;){
-//         vTaskDelay(3000 / portTICK_PERIOD_MS);
-//         flag_delayX=true;
-//     }
-// }
 
 // actualiza tiempo desde internet
 void Actualiza_WebTime() {
