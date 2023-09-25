@@ -91,10 +91,10 @@ void loop() {
         // estados desde Arduino a Node-RED
         for (int i = 0; i < sizeof(StatusON) / sizeof(StatusON[0]); i++) {
             if (data == StatusON[i]) {
-                Topic = Devices[i] + "/status";
+                Topic = Devices[i];
                 send_Nodered(Topic, "true");
             } else if (data == StatusOFF[i]) {
-                Topic = Devices[i] + "/status";
+                Topic = Devices[i];
                 send_Nodered(Topic, "false");
             }
         }

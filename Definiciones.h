@@ -1,12 +1,12 @@
 // Dispositivo remoto en la red, a de coincidir con el topico en nodered "device/#"
 // String TopicDevice      = "Astral";  // porton prototype
 // const char* Device      = "ASTRAL";  // PORTON PROTOTIPO
-String TopicDevice      = "prototype";  // porton prototype
-const char* Device      = "PROTOTIPO";  // PORTON PROTOTIPO
+String TopicDevice      = "astral";  // porton prototype
+const char* Device      = "ASTRAL";  // PORTON PROTOTIPO
 
-boolean ssid_list        = 1;
+boolean ssid_list        = 0;
 const char* ssid         = "";
-const char* ssidX[]       = {"VIRUSLAN32", "VIRUSLAN"};
+const char* ssidX[]       = {"VIRUSLAN2", "VIRUSLAN"};
 const char* password     = "1Q2W3E4R5T6Y7U8I9O0P$";
 const char* hostname     = "AstralClient";
 
