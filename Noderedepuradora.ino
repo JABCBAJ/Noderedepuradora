@@ -63,8 +63,8 @@ void setup() {
     // xTaskCreatePinnedToCore(keepWiFiAlive, "keepWiFiAlive", 1023, NULL, 1, NULL, 1);
     // xTaskCreatePinnedToCore(delayX, "delayX", 1000, NULL, 0, NULL, 0);
 
-    Serial.println("#### run ####");
-    Serial.println("OTA run OTA");
+    // Serial.println("#### run ####");
+    // Serial.println("OTA run OTA");
 }
 //·································································································································
 //·································································································································
@@ -87,7 +87,6 @@ void loop() {
         data = Serial.readString(); 
         // Bypass datos serie a BT HC06
         BTHC06.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
-        ArduinoSerial.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
 
         // estados desde Arduino a Node-RED
         for (int i = 0; i < sizeof(StatusON) / sizeof(StatusON[0]); i++) {
