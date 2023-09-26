@@ -8,7 +8,6 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-#include "VccRead.h"
 
 WiFiClient wifiClient;
 PubSubClient mqttclient(wifiClient);
@@ -21,7 +20,6 @@ HardwareSerial ArduinoSerial(2);  // Crea una instancia de HardwareSerial asocia
 #include <ESP32Time.h> 
 
 #include "Comunicaciones.h"
-#include "keepWiFiAlive.h"
 #include "Ordenes_Nodered.h"
 
 // Create an NTPClient to get the time
@@ -84,7 +82,7 @@ void loop() {
 
     if (ArduinoSerial.available()) {
         // Captura datos desde Arduino Pro Mini
-        data = Serial.readString(); 
+        data = ArduinoSerial.readString(); 
         // Bypass datos serie a BT HC06
         BTHC06.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
 
