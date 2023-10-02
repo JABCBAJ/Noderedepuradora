@@ -38,9 +38,9 @@ void setup() {
     // Serial.begin(9600, SERIAL_8N1, 3, 1);                                 // Inicia el puerto serie USB
     // Serial.setTimeout(100);
     ArduinoSerial.begin(9600, SERIAL_8N1, 15, 2);       //  3, 1 (15,2)Inicia el puerto serie 0 con los pines GPIO3  (RX0) y GPIO1  (TX0)
-    ArduinoSerial.setTimeout(100);
+    ArduinoSerial.setTimeout(10);
     BTHC06.begin(9600, SERIAL_8N1, 16, 17);             // Inicia el puerto serie 2 con los pines GPIO16 (RX1) y GPIO17 (TX1)
-    BTHC06.setTimeout(100);
+    BTHC06.setTimeout(10);
     
     WiFi_conect();
 
@@ -79,31 +79,34 @@ void loop() {
     now = time(NULL);
     
     String data;
-
+    int count=0;
     if (ArduinoSerial.available()) {
-        // Captura datos desde Arduino Pro Mini
-        data = ArduinoSerial.readString(); 
-        // Bypass datos serie a BT HC06
-        BTHC06.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
-
-        // estados desde Arduino a Node-RED
-        for (int i = 0; i < sizeof(StatusON) / sizeof(StatusON[0]); i++) {
-            if (data == StatusON[i]) {
-                Topic = Devices[i];
-                send_Nodered(Topic, "true");
-            } else if (data == StatusOFF[i]) {
-                Topic = Devices[i];
-                send_Nodered(Topic, "false");
-            }
+        static int reducemuestras;
+        if(reducemuestras>=3) {
+            // Captura datos desde Arduino Pro Mini
+            data = ArduinoSerial.readStringUntil('\n'); 
+            TelnetStream.println(data);
+            // Bypass datos serie a BT HC06
+            // BTHC06.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
+            BTHC06.print(data + '\n');
+            // encuentra "I" en el mensaje manda a node red
+            if (data.indexOf('I') != -1) {  send_Nodered(TopicDevice, data); }
+            reducemuestras = 0;
+            data = "";
         }
-        data = "";
+        else {
+            data = ArduinoSerial.readStringUntil('\n');
+            reducemuestras++;
+        }
     }
 
 
-    // captura y reenvia datos desde BTHC06 al arduino
+    // captura desde BTHC06 y lo reenvia a arduino
     if (BTHC06.available()) {
-        String data = BTHC06.readString();          // Lee un byte del puerto serie GPIO15
-        ArduinoSerial.write(data.c_str(), data.length());  // Envía el byte al puerto serie GPIO2
+        String data = BTHC06.readStringUntil('\n');         // Lee un byte del puerto serie GPIO15
+        // ArduinoSerial.write(data.c_str(), data.length());  // Envía el byte al puerto serie GPIO2
+        ArduinoSerial.print(data + '\n');
+        data = "";
     }
 
 
@@ -123,7 +126,7 @@ void loop() {
     }
 
     
-    delay(100);
+    // delay(100);
     mqttclient.loop();
 }
 //###########################################################################################
@@ -135,16 +138,13 @@ void status_device() {
     mqttclient.publish( (TopicDevice+"/IP").c_str() , String ( WiFi.localIP().toString()).c_str() );
     mqttclient.publish( (TopicDevice+"/MAC").c_str() , String ( WiFi.macAddress()).c_str() );
     mqttclient.publish( (TopicDevice+"/WIFI").c_str() , String ( WiFi.SSID()).c_str() );
-    mqttclient.publish( (TopicDevice+"/BAT").c_str() , String ( batteryVoltage).c_str() );
     TelnetStream.print( WiFi.RSSI());
     TelnetStream.print( "-");
     TelnetStream.print( WiFi.localIP().toString());
     TelnetStream.print( "-");
     TelnetStream.println(WiFi.macAddress());
-    TelnetStream.println(rtc.getTime()    );
-    TelnetStream.print( "Bateria: ");
-    TelnetStream.print(batteryVoltage);
-    TelnetStream.println( "V");
+    // TelnetStream.println(rtc.getTime()    );
+
     //    ArduinoSerial.println(rtc.getTime() );
 }
 

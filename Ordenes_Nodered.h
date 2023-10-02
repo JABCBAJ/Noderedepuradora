@@ -7,21 +7,21 @@ bool ordenes_Nodered() {
     // solo para test
     if(receive_Topic!="") {
 
-        // // TelnetStream.print("<<< topic  : ");
-        // // TelnetStream.println(receive_Topic);
-        // // TelnetStream.print("<<< payload: ");
-        // // TelnetStream.println(receive_Payload);
+        TelnetStream.print("<<< topic  : ");
+        TelnetStream.println(receive_Topic);
+        TelnetStream.print("<<< payload: ");
+        TelnetStream.println(receive_Payload);
 
         // Serial.println(receive_Topic);
         // localiza si la orden enviada esta en la lista de encendido o apagado
         for (int i = 0; i < sizeof(Devices) / sizeof(Devices[0]); i++) {
             if (receive_Topic==Devices[i]) {
-                if (receive_Payload=="true") {
-                    ArduinoSerial.print(OrdenesON[i]);
+                if (receive_Payload=="off") {
+                    ArduinoSerial.print(OrdenesON[i] + '\n');
                     // Serial.print("xxxx");
                 }
-                if (receive_Payload=="false") {
-                    ArduinoSerial.print(OrdenesOFF[i]);
+                if (receive_Payload=="on") {
+                    ArduinoSerial.print(OrdenesOFF[i] + '\n');
                     // Serial.print("xxxx");
                 }
             }   

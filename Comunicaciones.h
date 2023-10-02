@@ -45,10 +45,10 @@ void reconnect() {
         // ***************************************************
         // subscribe topics
         mqttclient.subscribe((TopicDevice+"/Mqtt_Live").c_str() );
-        mqttclient.subscribe((TopicDevice+"/MOTOR").c_str() );
-        mqttclient.subscribe((TopicDevice+"/CLORO").c_str() );
-        mqttclient.subscribe((TopicDevice+"/FOCO").c_str() );
-        mqttclient.subscribe((TopicDevice+"/TIMER").c_str() );
+        mqttclient.subscribe((TopicDevice+"/motor").c_str() );
+        mqttclient.subscribe((TopicDevice+"/cloro").c_str() );
+        mqttclient.subscribe((TopicDevice+"/foco").c_str() );
+        mqttclient.subscribe((TopicDevice+"/timer").c_str() );
         // subscribe topics
         // ***************************************************
     }
