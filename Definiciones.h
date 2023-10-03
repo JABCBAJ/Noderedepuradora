@@ -16,7 +16,7 @@ const char* hostname     = "AstralClient";
 #define mqttPort      1883
 #define clientID      "AstralClient"
 
-int nodered_ciclo = 10;
+int nodered_ciclo = 60;
 int tmp36Pin = 33;
 float temperatureC;
 
@@ -30,7 +30,7 @@ String  Topic;
 bool    flag_delayX        =false;
 bool    flag_mqtt_ok       =true;
 
-String  Devices[]      = {TopicDevice+"/motor",   TopicDevice+"/cloro",   TopicDevice+"/foco",   TopicDevice+"/timer"};
+String  Devices[]      = {TopicDevice+"/MOTOR",   TopicDevice+"/CLORO",   TopicDevice+"/FOCO",   TopicDevice+"/TEMP"};
 String  OrdenesOFF[]   = {"A373528", "B373528", "C373528", "FFFFFFF"};                         // orden apagado de dispopositivos
 String  OrdenesON[]    = {"a373528", "b373528", "c373528", "L373528"};              // orden encendido de dispopositivos
 String  StatusOFF[]    = {"<Imgs00:0", "<Imgs01:0", "<Imgs02:0", "<Imgs16:0"};      // informacion de dispopositivos apagados

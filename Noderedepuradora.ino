@@ -78,10 +78,12 @@ void loop() {
     ordenes_Nodered();
     now = time(NULL);
     
+    // Captura datos serial de arduino y los reenvia a Nodered.
     String data;
     int count=0;
     if (ArduinoSerial.available()) {
         static int reducemuestras;
+        // reduce el número de envíos
         if(reducemuestras>=3) {
             // Captura datos desde Arduino Pro Mini
             data = ArduinoSerial.readStringUntil('\n'); 
@@ -89,8 +91,15 @@ void loop() {
             // Bypass datos serie a BT HC06
             // BTHC06.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
             BTHC06.print(data + '\n');
-            // encuentra "I" en el mensaje manda a node red
-            if (data.indexOf('I') != -1) {  send_Nodered((TopicDevice+"/STATUS").c_str() , String ( data).c_str()); }
+            // encuentra los mensajes que contienen "I" y los manda a node red
+            if (data.indexOf('I') != -1) {  
+                // send_Nodered((TopicDevice+"/STATUS").c_str() , String ( data).c_str()); 
+                for (size_t i = 0; i < 3; i++) {
+                    if(data==StatusON[i])  {send_Nodered((Devices[i]).c_str() , String ( "on").c_str());}
+                    if(data==StatusOFF[i]) {send_Nodered((Devices[i]).c_str() , String ( "off").c_str());}
+                }
+            }
+            // Reinicia contador de muestras.
             reducemuestras = 0;
             data = "";
         }
@@ -103,10 +112,10 @@ void loop() {
 
     // captura desde BTHC06 y lo reenvia a arduino
     if (BTHC06.available()) {
-        String data = BTHC06.readStringUntil('\n');         // Lee un byte del puerto serie GPIO15
+        String dataAPK = BTHC06.readStringUntil('\n');         // Lee un byte del puerto serie GPIO15
         // ArduinoSerial.write(data.c_str(), data.length());  // Envía el byte al puerto serie GPIO2
-        ArduinoSerial.print(data + '\n');
-        data = "";
+        ArduinoSerial.print(dataAPK + '\n');
+        dataAPK = "";
     }
 
 
@@ -115,14 +124,14 @@ void loop() {
     if (now-statustime > nodered_ciclo) {
         statustime=time(NULL);
         int TempValue = analogRead(tmp36Pin);           // lee temperatura
-        TelnetStream.print( "TempValue: ");
-        TelnetStream.println( TempValue);
+        // TelnetStream.print( "TempValue: ");
+        // TelnetStream.println( TempValue);
         float voltage = TempValue  / 1023.0;     // Convierte el valor a voltaje (3.3V en ESP32)
-        TelnetStream.print( "voltage: ");
-        TelnetStream.println( voltage);
+        // TelnetStream.print( "voltage: ");
+        // TelnetStream.println( voltage);
         temperatureC = (voltage - 0.5) * 100;   // Convierte el voltaje a temperatura en grados Celsius
-        TelnetStream.print( "temperatureC: ");
-        TelnetStream.println( temperatureC);
+        // TelnetStream.print( "temperatureC: ");
+        // TelnetStream.println( temperatureC);
         status_device();
     }
 
@@ -159,7 +168,7 @@ void status_device() {
 
 // publica datos a nodered
 void send_Nodered(String topic, String value) {
-    mqttclient.publish( (topic).c_str(), String ( value).c_str() );
+    mqttclient.publish( (topic).c_str(), String ( value).c_str());
 }
 
 // actualiza tiempo desde internet
