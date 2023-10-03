@@ -15,13 +15,15 @@ bool ordenes_Nodered() {
         // Serial.println(receive_Topic);
         // localiza si la orden enviada esta en la lista de encendido o apagado
         for (int i = 0; i < sizeof(Devices) / sizeof(Devices[0]); i++) {
-            if (receive_Topic==Devices[i]) {
+            if (receive_Topic==Topic_Devices[i]) {
                 if (receive_Payload=="off") {
-                    ArduinoSerial.print(OrdenesON[i] + '\n');
+                    ArduinoSerial.print(OrdenesON[i]); //  + '\n'
+                    Serial.write((uint8_t*)OrdenesON[i].c_str(), OrdenesON[i].length());
                     // Serial.print("xxxx");
                 }
-                if (receive_Payload=="on") {
-                    ArduinoSerial.print(OrdenesOFF[i] + '\n');
+                else if (receive_Payload=="on") {
+                    ArduinoSerial.print(OrdenesOFF[i]);
+                    // Serial.write((uint8_t*)OrdenesOFF[i].c_str(), OrdenesOFF[i].length());
                     // Serial.print("xxxx");
                 }
             }   

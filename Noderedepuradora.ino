@@ -75,40 +75,45 @@ void loop() {
 
     if (WiFi.status()==WL_CONNECTED && !mqttclient.connected()) {reconnect();}
     
-    ordenes_Nodered();
     now = time(NULL);
+
+    ordenes_Nodered();
     
-    // Captura datos serial de arduino y los reenvia a Nodered.
+    // Captura datos serial de arduino y los guarda en buffer.
     String data;
-    int count=0;
     if (ArduinoSerial.available()) {
-        static int reducemuestras;
-        // reduce el número de envíos
-        if(reducemuestras>=3) {
-            // Captura datos desde Arduino Pro Mini
+        for (size_t i = 0; i < 9; i++) {
+            // Captura trama dedatos desde Arduino Pro Mini
             data = ArduinoSerial.readStringUntil('\n'); 
-            TelnetStream.println(data);
+            // debug
+            // if (data.indexOf('I') != -1) { TelnetStream.println(data); }
+            // buffer temporal
+            From_Arduino[i] = data;
             // Bypass datos serie a BT HC06
             // BTHC06.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
             BTHC06.print(data + '\n');
-            // encuentra los mensajes que contienen "I" y los manda a node red
-            if (data.indexOf('I') != -1) {  
-                // send_Nodered((TopicDevice+"/STATUS").c_str() , String ( data).c_str()); 
-                for (size_t i = 0; i < 3; i++) {
-                    if(data==StatusON[i])  {send_Nodered((Devices[i]).c_str() , String ( "on").c_str());}
-                    if(data==StatusOFF[i]) {send_Nodered((Devices[i]).c_str() , String ( "off").c_str());}
-                }
-            }
-            // Reinicia contador de muestras.
-            reducemuestras = 0;
+
             data = "";
-        }
-        else {
-            data = ArduinoSerial.readStringUntil('\n');
-            reducemuestras++;
         }
     }
 
+    // actualiza cada 24h timeweb
+    static int cycle3sg;
+    if(now-cycle3sg > 3) {
+        cycle3sg=now;
+        // encuentra los mensajes que contienen "I" y los manda a node red
+        String Dato;
+        for (size_t i = 0; i < 9; i++) {
+            Dato = From_Arduino[i];
+            if (Dato.indexOf('I') != -1) {  
+                for (size_t j = 0; j < 3; j++) {
+                    if(Dato==StatusON[j])       {send_Nodered((Devices[j]).c_str() , String ( "on").c_str());}
+                    else if(Dato==StatusOFF[j]) {send_Nodered((Devices[j]).c_str() , String ( "off").c_str());}/* code */
+                }
+            }
+            // send_Nodered((Devices[i]).c_str() , String ( From_Arduino[i]).c_str());
+        }
+    }
 
     // captura desde BTHC06 y lo reenvia a arduino
     if (BTHC06.available()) {
@@ -131,7 +136,7 @@ void loop() {
         // TelnetStream.println( voltage);
         temperatureC = (voltage - 0.5) * 100;   // Convierte el voltaje a temperatura en grados Celsius
         // TelnetStream.print( "temperatureC: ");
-        // TelnetStream.println( temperatureC);
+        TelnetStream.println( temperatureC);
         status_device();
     }
 
@@ -142,7 +147,6 @@ void loop() {
         Actualiza_WebTime();  // UNA VEZ AL DIA
     }
 
-    
     // delay(100);
     mqttclient.loop();
 }

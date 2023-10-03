@@ -30,14 +30,14 @@ String  Topic;
 bool    flag_delayX        =false;
 bool    flag_mqtt_ok       =true;
 
+String Comand_Timer = {"L373528"};              // Comand Encript for timer mode temporizador 15 minutos
+String Comand_Prog  = {"@373528"};              // Comand Encript for program alarms mode
+String Comand_Reloj = {"T373528"};              // Comand Encript for time display mode
+
+String  Topic_Devices[]= {TopicDevice+"/motor",   TopicDevice+"/cloro",   TopicDevice+"/foco",   TopicDevice+"/temp"};
 String  Devices[]      = {TopicDevice+"/MOTOR",   TopicDevice+"/CLORO",   TopicDevice+"/FOCO",   TopicDevice+"/TEMP"};
 String  OrdenesOFF[]   = {"A373528", "B373528", "C373528", "FFFFFFF"};                         // orden apagado de dispopositivos
 String  OrdenesON[]    = {"a373528", "b373528", "c373528", "L373528"};              // orden encendido de dispopositivos
 String  StatusOFF[]    = {"<Imgs00:0", "<Imgs01:0", "<Imgs02:0", "<Imgs16:0"};      // informacion de dispopositivos apagados
 String  StatusON[]     = {"<Imgs00:1", "<Imgs01:1", "<Imgs02:1", "<Imgs16:1"};      // informacion de dispopositivos encendidos
-
-String Comand_Timer = {"L373528"};              // Comand Encript for timer mode temporizador 15 minutos
-String Comand_Prog  = {"@373528"};              // Comand Encript for program alarms mode
-String Comand_Reloj = {"T373528"};              // Comand Encript for time display mode
-
-float batteryVoltage = 0;
+String  From_Arduino[9]= {};    // buffer temporal
