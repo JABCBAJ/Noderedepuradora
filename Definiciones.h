@@ -1,8 +1,8 @@
 // Dispositivo remoto en la red, a de coincidir con el topico en nodered "device/#"
-// String TopicDevice      = "Astral";  // porton prototype
-// const char* Device      = "ASTRAL";  // PORTON PROTOTIPO
 String TopicDevice      = "astral";  // porton prototype
 const char* Device      = "ASTRAL";  // PORTON PROTOTIPO
+// String TopicDevice      = "prototype";  // porton prototype
+// const char* Device      = "PROTOTIPO";  // PORTON PROTOTIPO
 
 boolean ssid_list        = 0;
 const char* ssid         = "";
@@ -17,6 +17,8 @@ const char* hostname     = "AstralClient";
 #define clientID      "AstralClient"
 
 int nodered_ciclo = 10;
+int tmp36Pin = 33;
+float temperatureC;
 
 time_t now, time_mqtt_live, lastime1;
 
@@ -25,7 +27,6 @@ String  receive_Payload;
 String  receive_Topic;
 String  Topic;
 
-bool    Update_Node_Red    =false;
 bool    flag_delayX        =false;
 bool    flag_mqtt_ok       =true;
 

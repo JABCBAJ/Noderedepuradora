@@ -90,7 +90,7 @@ void loop() {
             // BTHC06.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
             BTHC06.print(data + '\n');
             // encuentra "I" en el mensaje manda a node red
-            if (data.indexOf('I') != -1) {  send_Nodered(TopicDevice, data); }
+            if (data.indexOf('I') != -1) {  send_Nodered((TopicDevice+"/STATUS").c_str() , String ( data).c_str()); }
             reducemuestras = 0;
             data = "";
         }
@@ -112,9 +112,17 @@ void loop() {
 
     // envia estado del dispositivo a node red
     static int statustime=time(NULL);
-    if (now-statustime > nodered_ciclo  || Update_Node_Red) {
-        Update_Node_Red=false;
+    if (now-statustime > nodered_ciclo) {
         statustime=time(NULL);
+        int TempValue = analogRead(tmp36Pin);           // lee temperatura
+        TelnetStream.print( "TempValue: ");
+        TelnetStream.println( TempValue);
+        float voltage = TempValue  / 1023.0;     // Convierte el valor a voltaje (3.3V en ESP32)
+        TelnetStream.print( "voltage: ");
+        TelnetStream.println( voltage);
+        temperatureC = (voltage - 0.5) * 100;   // Convierte el voltaje a temperatura en grados Celsius
+        TelnetStream.print( "temperatureC: ");
+        TelnetStream.println( temperatureC);
         status_device();
     }
 
@@ -138,6 +146,7 @@ void status_device() {
     mqttclient.publish( (TopicDevice+"/IP").c_str() , String ( WiFi.localIP().toString()).c_str() );
     mqttclient.publish( (TopicDevice+"/MAC").c_str() , String ( WiFi.macAddress()).c_str() );
     mqttclient.publish( (TopicDevice+"/WIFI").c_str() , String ( WiFi.SSID()).c_str() );
+    mqttclient.publish( (TopicDevice+"/TEMP").c_str() , String ( temperatureC).c_str() );
     TelnetStream.print( WiFi.RSSI());
     TelnetStream.print( "-");
     TelnetStream.print( WiFi.localIP().toString());
