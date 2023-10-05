@@ -23,9 +23,9 @@ float temperatureC;
 time_t now, time_mqtt_live, lastime1;
 
 // desde Mqtt
-String  receive_Payload;
-String  receive_Topic;
-String  Topic;
+String  receive_Payload = "";
+String  receive_Topic   = "";
+String  Topic           = "";
 
 bool    flag_delayX        =false;
 bool    flag_mqtt_ok       =true;
@@ -40,4 +40,4 @@ String  OrdenesOFF[]   = {"A373528", "B373528", "C373528", "FFFFFFF"};          
 String  OrdenesON[]    = {"a373528", "b373528", "c373528", "L373528"};              // orden encendido de dispopositivos
 String  StatusOFF[]    = {"<Imgs00:0", "<Imgs01:0", "<Imgs02:0", "<Imgs16:0"};      // informacion de dispopositivos apagados
 String  StatusON[]     = {"<Imgs00:1", "<Imgs01:1", "<Imgs02:1", "<Imgs16:1"};      // informacion de dispopositivos encendidos
-String  From_Arduino[9]= {};    // buffer temporal
+String  From_Arduino[] = {"         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         "};    // buffer temporal

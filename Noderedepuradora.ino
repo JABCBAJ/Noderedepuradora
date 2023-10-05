@@ -63,6 +63,7 @@ void setup() {
 
     // Serial.println("#### run ####");
     // Serial.println("OTA run OTA");
+    send_Nodered(TopicDevice+"/RESET" , "reset");
 }
 //·································································································································
 //·································································································································
@@ -85,14 +86,9 @@ void loop() {
         for (size_t i = 0; i < 9; i++) {
             // Captura trama dedatos desde Arduino Pro Mini
             data = ArduinoSerial.readStringUntil('\n'); 
-            // debug
-            // if (data.indexOf('I') != -1) { TelnetStream.println(data); }
             // buffer temporal
             From_Arduino[i] = data;
-            // Bypass datos serie a BT HC06
-            // BTHC06.write(data.c_str(), data.length()); // c_str()  puntero constante a la representación de caracteres de una cadena (string).
             BTHC06.print(data + '\n');
-
             data = "";
         }
     }
@@ -105,21 +101,25 @@ void loop() {
         String Dato;
         for (size_t i = 0; i < 9; i++) {
             Dato = From_Arduino[i];
-            if (Dato.indexOf('I') != -1) {  
+            if (Dato.indexOf('<Imgs0') != -1) {  
                 for (size_t j = 0; j < 3; j++) {
-                    if(Dato==StatusON[j])       {send_Nodered((Devices[j]).c_str() , String ( "on").c_str());}
-                    else if(Dato==StatusOFF[j]) {send_Nodered((Devices[j]).c_str() , String ( "off").c_str());}/* code */
+                    if(Dato==StatusON[j])       {send_Nodered(Devices[j], "on");}
+                    else if(Dato==StatusOFF[j]) {send_Nodered(Devices[j], "off");}/* code */
                 }
             }
-            // send_Nodered((Devices[i]).c_str() , String ( From_Arduino[i]).c_str());
         }
     }
 
     // captura desde BTHC06 y lo reenvia a arduino
     if (BTHC06.available()) {
         String dataAPK = BTHC06.readStringUntil('\n');         // Lee un byte del puerto serie GPIO15
-        // ArduinoSerial.write(data.c_str(), data.length());  // Envía el byte al puerto serie GPIO2
-        ArduinoSerial.print(dataAPK + '\n');
+        // ArduinoSerial.print(dataAPK + '\n');
+        if(dataAPK==OrdenesON[0])  {send_Nodered(TopicDevice+"/APKMOTOR" , "off");}
+        if(dataAPK==OrdenesOFF[0]) {send_Nodered(TopicDevice+"/APKMOTOR" , "on");}
+        if(dataAPK==OrdenesON[1])  {send_Nodered(TopicDevice+"/APKCLORO" , "off");}
+        if(dataAPK==OrdenesOFF[1]) {send_Nodered(TopicDevice+"/APKCLORO" , "on");}
+        if(dataAPK==OrdenesON[2])  {send_Nodered(TopicDevice+"/APKFOCO" , "off");}
+        if(dataAPK==OrdenesOFF[2]) {send_Nodered(TopicDevice+"/APKFOCO" , "on");}
         dataAPK = "";
     }
 
@@ -166,8 +166,6 @@ void status_device() {
     TelnetStream.print( "-");
     TelnetStream.println(WiFi.macAddress());
     // TelnetStream.println(rtc.getTime()    );
-
-    //    ArduinoSerial.println(rtc.getTime() );
 }
 
 // publica datos a nodered
