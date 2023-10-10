@@ -83,7 +83,7 @@ void loop() {
     // Captura datos serial de arduino y los guarda en buffer.
     String data;
     if (ArduinoSerial.available()) {
-        for (size_t i = 0; i < 9; i++) {
+        for (size_t i = 0; i < numeromensajes; i++) {
             // Captura trama dedatos desde Arduino Pro Mini
             data = ArduinoSerial.readStringUntil('\n'); 
             // buffer temporal
@@ -99,10 +99,10 @@ void loop() {
         cycle3sg=now;
         // encuentra los mensajes que contienen "I" y los manda a node red
         String Dato;
-        for (size_t i = 0; i < 9; i++) {
+        for (size_t i = 0; i < numeromensajes; i++) {
             Dato = From_Arduino[i];
             if (Dato.indexOf('<Imgs0') != -1) {  
-                for (size_t j = 0; j < 3; j++) {
+                for (size_t j = 0; j < sizeof(StatusON)/sizeof(StatusON[0]); j++) {
                     if(Dato==StatusON[j])       {send_Nodered(Devices[j], "on");}
                     else if(Dato==StatusOFF[j]) {send_Nodered(Devices[j], "off");}/* code */
                 }
@@ -129,13 +129,8 @@ void loop() {
     if (now-statustime > nodered_ciclo) {
         statustime=time(NULL);
         int TempValue = analogRead(tmp36Pin);           // lee temperatura
-        // TelnetStream.print( "TempValue: ");
-        // TelnetStream.println( TempValue);
         float voltage = TempValue  / 1023.0;     // Convierte el valor a voltaje (3.3V en ESP32)
-        // TelnetStream.print( "voltage: ");
-        // TelnetStream.println( voltage);
         temperatureC = (voltage - 0.5) * 100;   // Convierte el voltaje a temperatura en grados Celsius
-        // TelnetStream.print( "temperatureC: ");
         TelnetStream.println( temperatureC);
         status_device();
     }

@@ -16,7 +16,7 @@ const char* hostname     = "AstralClient";
 #define mqttPort      1883
 #define clientID      "AstralClient"
 
-int nodered_ciclo = 60;
+int nodered_ciclo = 5*60;
 int tmp36Pin = 33;
 float temperatureC;
 
@@ -34,10 +34,11 @@ String Comand_Timer = {"L373528"};              // Comand Encript for timer mode
 String Comand_Prog  = {"@373528"};              // Comand Encript for program alarms mode
 String Comand_Reloj = {"T373528"};              // Comand Encript for time display mode
 
+int numeromensajes     = 9;
 String  Topic_Devices[]= {TopicDevice+"/motor",   TopicDevice+"/cloro",   TopicDevice+"/foco",   TopicDevice+"/temp"};
 String  Devices[]      = {TopicDevice+"/MOTOR",   TopicDevice+"/CLORO",   TopicDevice+"/FOCO",   TopicDevice+"/TEMP"};
-String  OrdenesOFF[]   = {"A373528", "B373528", "C373528", "FFFFFFF"};                         // orden apagado de dispopositivos
-String  OrdenesON[]    = {"a373528", "b373528", "c373528", "L373528"};              // orden encendido de dispopositivos
-String  StatusOFF[]    = {"<Imgs00:0", "<Imgs01:0", "<Imgs02:0", "<Imgs16:0"};      // informacion de dispopositivos apagados
-String  StatusON[]     = {"<Imgs00:1", "<Imgs01:1", "<Imgs02:1", "<Imgs16:1"};      // informacion de dispopositivos encendidos
+String  OrdenesOFF[]   = {"A373528", "B373528", "C373528", "         "};                         // orden apagado de dispopositivos
+String  OrdenesON[]    = {"a373528", "b373528", "c373528", "         "};              // orden encendido de dispopositivos
+String  StatusOFF[]    = {"<Imgs00:0", "<Imgs01:0", "<Imgs02:0"};      // informacion de dispopositivos apagados
+String  StatusON[]     = {"<Imgs00:1", "<Imgs01:1", "<Imgs02:1"};      // informacion de dispopositivos encendidos
 String  From_Arduino[] = {"         ", "         ", "         ", "         ", "         ", "         ", "         ", "         ", "         "};    // buffer temporal
