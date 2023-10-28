@@ -142,6 +142,12 @@ void loop() {
         Actualiza_WebTime();  // UNA VEZ AL DIA
     }
 
+    // chequea comunicacion con nodered cada 5 min o reset
+    if(now-time_mqtt_live > 5*60) {
+        time_mqtt_live=now;
+        ESP.restart();
+    }
+
     // delay(100);
     mqttclient.loop();
 }

@@ -4,9 +4,9 @@ const char* Device      = "ASTRAL";  // PORTON PROTOTIPO
 // String TopicDevice      = "prototype";  // porton prototype
 // const char* Device      = "PROTOTIPO";  // PORTON PROTOTIPO
 
-boolean ssid_list        = 0;
-const char* ssid         = "";
-const char* ssidX[]       = {"VIRUSLAN2", "VIRUSLAN"};
+// boolean ssid_list        = 0;
+const char* ssid         = "VIRUSLAN";
+// const char* ssidX[]       = {"VIRUSLAN2", "VIRUSLAN"};
 const char* password     = "1Q2W3E4R5T6Y7U8I9O0P$";
 const char* hostname     = "AstralClient";
 
@@ -16,7 +16,7 @@ const char* hostname     = "AstralClient";
 #define mqttPort      1883
 #define clientID      "AstralClient"
 
-int nodered_ciclo = 5*60;
+int nodered_ciclo = 1*60;
 int tmp36Pin = 33;
 float temperatureC;
 

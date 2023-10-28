@@ -5,24 +5,25 @@
 void WiFi_conect() {
     
     // WiFi.mode(WIFI_STA);
-    ssid_list=!ssid_list;
-    ssid = ssidX[ssid_list];
+    // ssid_list=!ssid_list;
+    // ssid = ssidX[ssid_list];
 
-    int countdown;
-    countdown=millis();     // hay que utilizar milis, porque sin Wifi no Devicesa time(NULL).
-    Serial.print("\nconnecting to wifi-" + (String) ssid_list);
+    int countdown = millis();     // hay que utilizar milis, porque sin Wifi no esta actualizado  time(NULL).
+    // Serial.print("\nconnecting to wifi-" + (String) ssid_list);
     
     WiFi.begin(ssid, password);
 
-    while (WiFi.status() != WL_CONNECTED && (millis() - countdown) < 9000) {
+    while (WiFi.status() != WL_CONNECTED && (millis() - countdown) < 60000) {
         Serial.print(".");
         for (size_t i = 0; i < 30; i++) {delayMicroseconds(10000);}
         if (WiFi.status() == WL_CONNECTED) {  
             WiFi.hostname(hostname); 
             Serial.println(WiFi.SSID());
             Serial.println(WiFi.localIP());
+            return;
         }
     }
+    ESP.restart();
 }
 //...........................................................................
 // Subscribe callback which is called when every packet has come
